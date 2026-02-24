@@ -1,79 +1,86 @@
-# 🚗 Salon Auto Québec 2026 — Planificateur Bénévoles Tesla
+# 📅 Rallyo — Planification bénévoles pour OBNL
 
-Application web pour planifier les bénévoles Tesla au Salon de l'Auto de Québec 2026.
+Outil gratuit et open source pour planifier les bénévoles lors d'événements communautaires.
 
-**Club Owners Québec (COQ) · 3–8 mars 2026 · Centre de foires de Québec**
+**[rallyo.pages.dev](https://rallyo.pages.dev)**
 
 ## Fonctionnalités
 
-- **Grille horaire** — Visualiser qui est inscrit à chaque plage (indicateurs vert/jaune/rouge)
-- **Inscription self-service** — Les bénévoles s'inscrivent eux-mêmes et reçoivent un code personnel
-- **Mon horaire** — Modifier ses disponibilités avec son code personnel
-- **Admin** — Gérer toutes les affectations, exporter CSV
+- **Création d'événement self-service** — Wizard 2 étapes, prêt en 2 minutes
+- **Grille horaire visuelle** — Indicateurs 🟢🟡🔴🔵 pour la couverture
+- **Inscription self-service** — Les bénévoles cochent leurs dispos, reçoivent un code personnel
+- **Admin sécurisé** — Gérer les affectations, configurer min/max par plage, export CSV
+- **Mobile-first** — Interface optimisée pour téléphone
+- **Multi-événements** — Chaque événement a son propre slug et sa propre config
 
-## Plages horaires
+## Pour qui?
 
-| Plage | Heures |
-|-------|--------|
-| Matin (AM) | 9h – 13h |
-| Après-midi (PM) | 13h – 17h |
-| Soir | 17h – 21h |
-
-6 jours × 3 plages = **18 slots** au total. Minimum 3 bénévoles par plage (indicateur visuel).
+Festivals, salons, événements sportifs, marchés de Noël, courses, événements culturels, communautés religieuses, écoles — tout OBNL qui a besoin de planifier des bénévoles.
 
 ## Stack technique
 
 - **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS v3
-- **Backend:** Cloudflare Pages Functions (Workers)
+- **Backend:** Cloudflare Pages Functions
 - **Base de données:** Cloudflare D1 (SQLite)
 - **Hébergement:** Cloudflare Pages
-- **Package manager:** Bun
+- **Coût:** 0$ (free tiers Cloudflare)
 
 ## Déploiement
 
-### 1. Créer la D1 database
+### 1. Cloner et installer
 
 ```bash
-npx wrangler d1 create salon-auto-db
+git clone https://github.com/chrisboulet/rallyo.git
+cd rallyo
+bun install
+```
+
+### 2. Créer la D1 database
+
+```bash
+npx wrangler d1 create rallyo-db
 # Copier le database_id dans wrangler.toml
 ```
 
-### 2. Appliquer les migrations
+### 3. Appliquer les migrations
 
 ```bash
-npx wrangler d1 execute salon-auto-db --file=./migrations/0001_init.sql
+npx wrangler d1 execute rallyo-db --remote --file=./migrations/0001_rallyo.sql
 ```
 
-### 3. Configurer wrangler.toml
+### 4. Configurer wrangler.toml
 
-Remplacer `REPLACE_WITH_YOUR_D1_DATABASE_ID` par l'ID réel.
-Changer `ADMIN_PASSWORD` si désiré.
+- Remplacer le `database_id`
+- Changer `MASTER_KEY` (clé pour créer des événements via API)
 
-### 4. Build et déploiement
+### 5. Build et déploiement
 
 ```bash
-bun install
 bun run build
 npx wrangler pages deploy dist
 ```
-
-### 5. Variables d'environnement (production)
-
-Dans le dashboard Cloudflare Pages, ajouter:
-- `ADMIN_PASSWORD` = votre mot de passe admin
 
 ## Développement local
 
 ```bash
 bun install
-bun run dev          # Frontend seulement (sans API)
+bun run dev
 ```
 
-Pour tester avec les fonctions Cloudflare:
-```bash
-npx wrangler pages dev dist --d1 DB=<database_id>
-```
+## API
 
-## Mot de passe admin
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| GET | `/api/events` | Lister les événements publics |
+| GET | `/api/events/:slug` | Info événement + grille complète |
+| POST | `/api/events/create` | Créer un événement (master key) |
+| POST | `/api/events/:slug/register` | Inscrire un bénévole |
+| GET | `/api/events/:slug/volunteer/:token` | Voir ses inscriptions |
+| PUT | `/api/events/:slug/volunteer/:token` | Modifier ses inscriptions |
+| GET | `/api/events/:slug/admin` | Liste des bénévoles (admin) |
+| POST/DELETE | `/api/events/:slug/admin/registrations` | Gérer les affectations (admin) |
+| PUT | `/api/events/:slug/admin/slots` | Modifier min/max d'une plage (admin) |
 
-Par défaut: `tesla2026` (configurable dans `wrangler.toml` ou variable d'env)
+## Licence
+
+MIT — Boulet Stratégies TI
