@@ -1,0 +1,12 @@
+name = "rallyo"
+compatibility_date = "2024-12-18"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rallyo-db"
+database_id = "d70659f2-8877-4352-b12d-de15247b9b8b"
+
+[vars]
+ENVIRONMENT = "production"
+MASTER_KEY = "rallyo-master-2026"
