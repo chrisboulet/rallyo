@@ -77,7 +77,7 @@ export default function App() {
             <div className="font-bold text-sm leading-tight">{event.name}</div>
             <div className="text-xs text-zinc-500 leading-tight">
               {event.org_name && `${event.org_name} · `}
-              {event.start_date} – {event.end_date}
+              {data.days[0]?.label} – {data.days[data.days.length - 1]?.label}
             </div>
           </div>
         </div>

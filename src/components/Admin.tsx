@@ -27,6 +27,16 @@ export default function Admin({ data, onRefresh }: Props) {
     finally { setLoading(false) }
   }
 
+  const deleteVolunteer = async (v: Volunteer) => {
+    if (!confirm(`Supprimer ${v.name} et toutes ses inscriptions?`)) return
+    await fetch(`/api/events/${event.slug}/admin/volunteers/${v.id}`, {
+      method: 'DELETE',
+      headers: { 'X-Admin-Key': password },
+    })
+    await fetchVolunteers(password)
+    onRefresh()
+  }
+
   const toggleReg = async (v: Volunteer, slotId: number) => {
     const has = v.slot_ids.includes(slotId)
     await fetch(`/api/events/${event.slug}/admin/registrations`, {
@@ -91,6 +101,17 @@ export default function Admin({ data, onRefresh }: Props) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold">🔒 Admin — {volunteers.length} bénévoles</h2>
         <div className="flex gap-2">
+          <button onClick={async () => {
+            const newStatus = event.status === 'open' ? 'closed' : 'open'
+            await fetch(`/api/events/${event.slug}/admin/status`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', 'X-Admin-Key': password },
+              body: JSON.stringify({ status: newStatus }),
+            })
+            onRefresh()
+          }} className={`btn-ghost text-sm ${event.status === 'closed' ? 'text-red-400' : 'text-green-400'}`}>
+            {event.status === 'open' ? '🟢 Ouvert' : '🔴 Fermé'}
+          </button>
           <button onClick={() => setShowConfig(!showConfig)} className={`btn-ghost text-sm ${showConfig ? 'ring-1 ring-ctq-blue' : ''}`}>⚙️ Config</button>
           <button onClick={exportCSV} className="btn-ghost text-sm">📥 CSV</button>
           <button onClick={() => { fetchVolunteers(password); onRefresh() }} className="btn-ghost text-sm">🔄</button>
@@ -183,7 +204,10 @@ export default function Admin({ data, onRefresh }: Props) {
                   {v.email && <span className="ml-2 text-xs text-zinc-500">{v.email}</span>}
                   {v.phone && <span className="ml-2 text-xs text-zinc-500">{v.phone}</span>}
                 </div>
-                <span className="text-xs text-zinc-500">{v.slot_ids.length} plage{v.slot_ids.length !== 1 ? 's' : ''}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-zinc-500">{v.slot_ids.length} plage{v.slot_ids.length !== 1 ? 's' : ''}</span>
+                  <button onClick={() => deleteVolunteer(v)} className="text-xs text-red-500 hover:text-red-400" title="Supprimer">🗑️</button>
+                </div>
               </div>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-1.5">
                 {days.map(day => (
