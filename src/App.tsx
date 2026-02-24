@@ -5,6 +5,7 @@ import Register from './components/Register'
 import MySchedule from './components/MySchedule'
 import Admin from './components/Admin'
 import Landing from './components/Landing'
+import CreateEvent from './components/CreateEvent'
 
 type View = 'grid' | 'register' | 'my' | 'admin'
 
@@ -35,8 +36,9 @@ export default function App() {
 
   useEffect(() => { fetchEvent() }, [slug])
 
-  // No slug = landing page
+  // Special routes
   if (!slug) return <Landing />
+  if (slug === 'create') return <CreateEvent />
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center text-zinc-500">

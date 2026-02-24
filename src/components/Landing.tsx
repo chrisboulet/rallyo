@@ -18,7 +18,7 @@ export default function Landing() {
             Créez votre grille horaire, partagez le lien, et vos bénévoles s'inscrivent eux-mêmes.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <a href="mailto:christian@bouletstrategies.ca?subject=Rallyo%20-%20Créer%20mon%20événement" className="btn-tesla text-lg px-8 py-3">
+            <a href="/create" className="btn-tesla text-lg px-8 py-3">
               🚀 Créer mon événement
             </a>
           </div>
